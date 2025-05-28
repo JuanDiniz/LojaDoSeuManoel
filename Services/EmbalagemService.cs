@@ -13,61 +13,91 @@ namespace LojaDoSeuManoel.Services
             new Caixa { CaixaId = "Caixa 3", Dimensoes = new Dimensoes { Altura = 50, Largura = 80, Comprimento = 60 } },
         };
 
-        public List<EmbalagemResposta> CalcularEmbalagem(List<Pedido> pedidos)
+        public List<PedidoResposta> CalcularEmbalagem(List<Pedido> pedidos)
         {
-            var respostas = new List<EmbalagemResposta>();
+            var respostas = new List<PedidoResposta>();
 
             foreach (var pedido in pedidos)
             {
-                var resposta = new EmbalagemResposta
+                var caixasUsadas = new List<CaixaResposta>();
+
+                var produtosNaoAlocados = pedido.Produtos
+                    .OrderByDescending(p => p.Dimensoes.Volume)
+                    .ToList();
+
+                var caixasDisponiveis = new List<Caixa>
+        {
+            new Caixa { CaixaId = "Caixa 1", Dimensoes = new Dimensoes { Altura = 30, Largura = 40, Comprimento = 80 } },
+            new Caixa { CaixaId = "Caixa 2", Dimensoes = new Dimensoes { Altura = 80, Largura = 50, Comprimento = 40 } },
+            new Caixa { CaixaId = "Caixa 3", Dimensoes = new Dimensoes { Altura = 50, Largura = 80, Comprimento = 60 } },
+        };
+
+                var caixasUsadasInternas = new List<Caixa>();
+
+                foreach (var produto in produtosNaoAlocados)
                 {
-                    PedidoId = pedido.PedidoId,
-                    Caixas = new List<Caixa>()
-                };
+                    bool alocado = false;
 
-                var produtosNaoAlocados = new List<Produto>(pedido.Produtos);
-                produtosNaoAlocados.Sort((a, b) => b.Dimensoes.Volume.CompareTo(a.Dimensoes.Volume));
-
-                foreach (var caixaDisponivel in caixasDisponiveis)
-                {
-                    var caixaAtual = new Caixa
+                    foreach (var caixa in caixasUsadasInternas)
                     {
-                        CaixaId = caixaDisponivel.CaixaId,
-                        Dimensoes = caixaDisponivel.Dimensoes,
-                        Produtos = new List<string>()
-                    };
-
-                    foreach (var produto in produtosNaoAlocados.ToList())
-                    {
-                        if (CabeNaCaixa(produto, caixaDisponivel))
+                        if (ProdutoCabeNaCaixa(produto, caixa))
                         {
-                            caixaAtual.Produtos.Add(produto.ProdutoId);
-                            produtosNaoAlocados.Remove(produto);
+                            caixa.Produtos.Add(produto.ProdutoId);
+                            alocado = true;
+                            break;
                         }
                     }
 
-                    if (caixaAtual.Produtos.Any())
-                        resposta.Caixas.Add(caixaAtual);
+                    if (!alocado)
+                    {
+                        foreach (var caixaDisponivel in caixasDisponiveis.OrderBy(c => c.Dimensoes.Volume))
+                        {
+                            if (ProdutoCabeNaCaixa(produto, caixaDisponivel))
+                            {
+                                var novaCaixa = new Caixa
+                                {
+                                    CaixaId = caixaDisponivel.CaixaId,
+                                    Dimensoes = caixaDisponivel.Dimensoes,
+                                    Produtos = new List<string> { produto.ProdutoId }
+                                };
+                                caixasUsadasInternas.Add(novaCaixa);
+                                alocado = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!alocado)
+                    {
+                        caixasUsadas.Add(new CaixaResposta
+                        {
+                            caixa_id = null,
+                            produtos = new List<string> { produto.ProdutoId },
+                            observacao = "Produto não cabe em nenhuma caixa disponível."
+                        });
+                    }
                 }
 
-                // Produtos que não couberam em nenhuma caixa
-                foreach (var produto in produtosNaoAlocados)
+                foreach (var caixa in caixasUsadasInternas)
                 {
-                    resposta.Caixas.Add(new Caixa
+                    caixasUsadas.Add(new CaixaResposta
                     {
-                        CaixaId = null,
-                        Produtos = new List<string> { produto.ProdutoId },
-                        Observacao = "Produto não cabe em nenhuma caixa disponível."
+                        caixa_id = caixa.CaixaId,
+                        produtos = caixa.Produtos
                     });
                 }
 
-                respostas.Add(resposta);
+                respostas.Add(new PedidoResposta
+                {
+                    pedido_id = pedido.PedidoId,
+                    caixas = caixasUsadas
+                });
             }
 
             return respostas;
         }
 
-        private bool CabeNaCaixa(Produto produto, Caixa caixa)
+        private bool ProdutoCabeNaCaixa(Produto produto, Caixa caixa)
         {
             return produto.Dimensoes.Altura <= caixa.Dimensoes.Altura &&
                    produto.Dimensoes.Largura <= caixa.Dimensoes.Largura &&

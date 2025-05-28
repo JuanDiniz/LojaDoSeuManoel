@@ -1,8 +1,10 @@
-﻿namespace LojaDoSeuManoel.Models
+﻿namespace LojaDoSeuManoel.Models;
+using System.Text.Json.Serialization;
+
+public class Produto
 {
-    public class Produto
-    {
-        public string ProdutoId { get; set; }
-        public Dimensoes Dimensoes { get; set; }
-    }
-};
+    [JsonPropertyName("produto_id")]
+    public string ProdutoId { get; set; }
+
+    public Dimensoes Dimensoes { get; set; }
+}

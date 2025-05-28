@@ -16,14 +16,14 @@ public class EmbalagemController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Post([FromBody] List<Pedido> pedidos)
+    public IActionResult Post([FromBody] EntradaPedidos entrada)
     {
-        if (pedidos == null || !pedidos.Any())
+        if (entrada == null || entrada.pedidos == null || !entrada.pedidos.Any())
         {
             return BadRequest("A lista de pedidos está vazia ou nula.");
         }
 
-        var resultado = _embalagemService.CalcularEmbalagem(pedidos);
-        return Ok(resultado);
+        var resultado = _embalagemService.CalcularEmbalagem(entrada.pedidos);
+        return Ok(new SaidaPedidos { pedidos = resultado });
     }
 }
