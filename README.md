@@ -3,7 +3,7 @@
 ## 📝 Descrição
 Esta API calcula automaticamente a melhor forma de embalar os produtos de um pedido, usando caixas pré-definidas, otimizando o espaço e minimizando o número de caixas necessárias.
 
-A aplicação foi desenvolvida como parte de uma avaliação técnica e oferece:
+A aplicação oferece:
 - Processamento de pedidos via API
 - Cálculo de embalagens com base nas dimensões dos produtos e caixas
 - Autenticação básica para proteger o acesso
