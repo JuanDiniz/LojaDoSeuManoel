@@ -103,4 +103,3 @@ dotnet test
 A API está configurada para rodar via Docker, incluindo o SQL Server.
 
 Caso deseje rodar sem Docker, configure o appsettings.json com sua connection string local.
-
