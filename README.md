@@ -31,13 +31,11 @@ A aplicação foi desenvolvida como parte de uma avaliação técnica e oferece:
 
 🔹 Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
+git clone https://github.com/JuanDiniz/LojaDoSeuManoel.git
 cd seu-repositorio
 🔹 Rode o projeto com Docker Compose:
 
 bash
-Copiar
-Editar
 docker-compose up --build
 🔹 Acesse o Swagger UI para testar a API:
 
@@ -56,8 +54,6 @@ No Swagger, clique em Authorize, selecione o esquema basic e informe as credenci
 
 📬 Exemplo de Entrada (JSON)
 json
-Copiar
-Editar
 {
   "pedidos": [
     {
@@ -85,8 +81,6 @@ Editar
 }
 📤 Exemplo de Saída (JSON)
 json
-Copiar
-Editar
 {
   "pedidos": [
     {
@@ -100,10 +94,9 @@ Editar
     }
   ]
 }
+
 🧪 Testes Unitários
 Os testes estão localizados na pasta /LojaDoSeuManoel.Tests e podem ser executados com:
 
 bash
-Copiar
-Editar
 dotnet test
